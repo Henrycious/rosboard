@@ -1,12 +1,14 @@
 <!doctype html>
 <html>
     <head>
+      <meta charset="UTF-8"/>
       <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
         <link href="css/material-icons.css" media="all" rel="stylesheet" type="text/css">
         <script type="text/javascript" src="js/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="></script>
         <link rel="stylesheet" href="css/material.indigo-blue.min.css" />
         <link rel="stylesheet" href="css/uPlot.min.css">
         <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/styles.css">
         <link href="css/index.css" media="all" rel="stylesheet" type="text/css">
         
         <script type="text/javascript" src="js/json5.min.js"></script>
@@ -21,39 +23,130 @@
 	      <script type="text/javascript" src="js/litegl.min.js"></script>
         <script type="text/javascript" src="js/index.js" defer></script>
 
+        <script type="text/javascript" src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+        <script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+
+        <script>
+          
+        </script>
+
         <title>ROSboard</title>
-    </head>
-    <body>
-        <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-          <header class="mdl-layout__header">
-            <div class="mdl-layout__header-row">
-              <!-- Title -->
-              <span class="mdl-layout-title">ROSboard</span>
-              <!-- Add spacer, to align navigation to the right -->
-              <div class="mdl-layout-spacer"></div>
-            </div>
-          </header>
-          <div class="mdl-layout__drawer">
-            <nav id="topics-nav" class="mdl-navigation">
-                <div id="topics-nav-system-title" class="topics-nav-title">System</div>
-                <div id="topics-nav-system"></div>
-                <div id="topics-nav-ros-title" class="topics-nav-title">ROS topics</div>
-                <div id="topics-nav-ros"></div>
-                <div style="opacity:0.3;" id="topics-nav-unsupported"></div>
-            </nav>
-          </div>
-          <main class="mdl-layout__content">
-            <div class="page-content">
-              <div class="grid">
+  </head>
+  <body>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <!-- Title -->
+          <span class="mdl-layout-title">ROSboard</span>
+          <!-- Add spacer, to align navigation to the right -->
+          <div class="mdl-layout-spacer"></div>
+        </div>
+      </header>
+      <div class="mdl-layout__drawer">
+        <nav id="topics-nav" class="mdl-navigation">
+            <div id="topics-nav-system-title" class="topics-nav-title">System</div>
+            <div id="topics-nav-system"></div>
+            <div id="topics-nav-ros-title" class="topics-nav-title">ROS topics</div>
+            <div id="topics-nav-ros"></div>
+            <div style="opacity:0.3;" id="topics-nav-unsupported"></div>
+        </nav>
+      </div>
+      <main class="mdl-layout__content">
+        <div class="grid-container">
+
+          <div class="grid-item">
+            <div class="flex-container-input">  
+              <div class="flex-item">
+                <input type="checkbox" id="sensor1" name="sensor 1" checked/>
+                  <label for="sensor1">Sensor 1 (SICK LMS511)</label>
+                <input type="checkbox" id="sensor2" name="sensor 3" checked/>
+                  <label for="sensor2">Sensor 2 (Intel D415)</label>
+                <input type="checkbox" id="sensor3" name="sensor 2" checked/>
+                  <label for="sensor3">Sensor 3 (Intel D435)</label>
+                <input type="checkbox" id="sensor4" name="sensor 4" checked/>
+                  <label for="sensor4">Sensor 4 (Infisense P2)</label>
+                <input type="checkbox" id="sensor5" name="sensor 5" checked/>
+                  <label for="sensor5">Sensor 5 (Webcam)</label>
+              </div>
+              <div class="flex-item">
+                <div class="flex-item">
+                  <button id="rosbag_start">Click to Start ROSBAG!</button>
+                  <button id="rosbag_stop">Click to Stop ROSBAG!</button>
+                </div>
               </div>
             </div>
-          </main>
-        </div>
-        
-  <div id="demo-toast-example" class="mdl-js-snackbar mdl-snackbar">
-    <div class="mdl-snackbar__text"></div>
-    <button class="mdl-snackbar__action" type="button"></button>
-  </div>
+          </div>
 
-    </body>
+          <div class="grid-item">
+            <div class="page-content">
+            <div class="grid"></div>
+          </div>
+
+        </div>
+      <!--Button Click-Script-->
+      <script>
+        //Initialize connection
+        var ros = new ROSLIB.Ros({
+            url : 'ws://localhost:9090'
+          });
+
+        ros.on('connection', function() {
+          console.log('Connected to websocket server.');
+        });
+
+        ros.on('error', function(error) {
+          console.log('Error connecting to websocket server: ', error);
+        });
+
+        ros.on('close', function() {
+          console.log('Connection to websocket server closed.');
+        });
+
+        //Buttons
+        var pub_start = document.getElementById("rosbag_start");
+        var pub_stop = document.getElementById("rosbag_stop");
+
+        pub_start.onclick = function(){
+          start = true;
+          publish();
+        };  
+        pub_stop.onclick = function(){
+          start = false;
+          publish();
+        };
+
+        function publish(){
+          control_msg = new ROSLIB.Topic({
+            ros : ros,
+            name : '/control',
+            messageType : 'std_msgs/ByteMultiArray'
+          });
+          const cb_sensor1 = document.getElementById("sensor1");
+          const cb_sensor2 = document.getElementById("sensor2");
+          const cb_sensor3 = document.getElementById("sensor3");
+          const cb_sensor4 = document.getElementById("sensor4");
+          const cb_sensor5 = document.getElementById("sensor5");
+
+          var control = new ROSLIB.Message({
+            data : [start,
+                    cb_sensor1.checked,
+                    cb_sensor2.checked,
+                    cb_sensor3.checked,
+                    cb_sensor4.checked,
+                    cb_sensor5.checked]
+        });
+
+          control_msg.publish(control);
+        };  
+      </script>
+<!--input-->
+        </div>
+      </main>
+    </div>
+  
+  <div id="demo-toast-example" class="mdl-js-snackbar mdl-snackbar">
+      <div class="mdl-snackbar__text"></div>
+      <button class="mdl-snackbar__action" type="button"></button>
+    </div>
+  </body>
 </html>

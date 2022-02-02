@@ -40,7 +40,7 @@ class GenericViewer extends Viewer {
               $('<td></td>')
                 .addClass('mdl-data-table__cell--non-numeric')
                 .text(field)
-                .css({'width': '40%', 'font-weight': 'bold', 'overflow': 'hidden', 'text-overflow': 'ellipsis'})
+                .css({'width': '6rem', 'font-weight': 'bold', 'overflow': 'hidden', 'text-overflow': 'ellipsis'})
                 .appendTo(tr);
               this.fieldNodes[field] = $('<td></td>')
                 .addClass('mdl-data-table__cell--non-numeric')

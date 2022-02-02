@@ -24,6 +24,8 @@ var snackbarContainer = document.querySelector('#demo-toast-example');
 
 let subscriptions = {};
 
+//window.localStorage.subscriptions.topicName = "_system_stats";
+
 if(window.localStorage && window.localStorage.subscriptions) {
   if(window.location.search && window.location.search.indexOf("reset") !== -1) {
     subscriptions = {};
