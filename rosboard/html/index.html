@@ -30,14 +30,14 @@
           
         </script>
 
-        <title>ROSboard</title>
+        <title>Testbench</title>
   </head>
   <body>
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
       <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
           <!-- Title -->
-          <span class="mdl-layout-title">ROSboard</span>
+          <span class="mdl-layout-title">Testbench</span>
           <!-- Add spacer, to align navigation to the right -->
           <div class="mdl-layout-spacer"></div>
         </div>
@@ -118,8 +118,8 @@
         function publish(){
           control_msg = new ROSLIB.Topic({
             ros : ros,
-            name : '/control',
-            messageType : 'std_msgs/ByteMultiArray'
+            name : '/webcommand',
+            messageType : 'std_msgs/msg/String'
           });
           const cb_sensor1 = document.getElementById("sensor1");
           const cb_sensor2 = document.getElementById("sensor2");
@@ -128,18 +128,17 @@
           const cb_sensor5 = document.getElementById("sensor5");
 
           var control = new ROSLIB.Message({
-            data : [start,
-                    cb_sensor1.checked,
-                    cb_sensor2.checked,
-                    cb_sensor3.checked,
-                    cb_sensor4.checked,
-                    cb_sensor5.checked]
+            data :  start.toString() + 
+                    cb_sensor1.checked.toString() + 
+                    cb_sensor2.checked.toString() + 
+                    cb_sensor3.checked.toString() + 
+                    cb_sensor4.checked.toString() + 
+                    cb_sensor5.checked.toString()
         });
 
           control_msg.publish(control);
         };  
       </script>
-<!--input-->
         </div>
       </main>
     </div>
