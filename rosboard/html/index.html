@@ -86,19 +86,23 @@
       <!--Button Click-Script-->
       <script>
         //Initialize connection
+        var init = false;
+        if (!init) {
+          connected=false;
+          init=true;
+        }
+
         var ros = new ROSLIB.Ros({
             url : 'ws://localhost:9090'
-          });
-
-        ros.on('connection', function() {
+        }); 
+        ros.on('connection', () => {
+          connected=true;
           console.log('Connected to websocket server.');
         });
-
         ros.on('error', function(error) {
           console.log('Error connecting to websocket server: ', error);
         });
-
-        ros.on('close', function() {
+        ros.on('close', () => {
           console.log('Connection to websocket server closed.');
         });
 
@@ -107,14 +111,21 @@
         var pub_stop = document.getElementById("rosbag_stop");
 
         pub_start.onclick = function(){
+          if (!connected) {
+            alert('No connection to the Rosbag-Server - Plese re-run the testbench_launch_file')
+            return 
+          }
+          pub_start.style.background='#008800';
           start = true;
           publish();
         };  
+
         pub_stop.onclick = function(){
+          pub_start.style.background='#ffffff';
           start = false;
           publish();
         };
-
+        
         function publish(){
           control_msg = new ROSLIB.Topic({
             ros : ros,
