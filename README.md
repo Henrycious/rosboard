@@ -1,7 +1,7 @@
 # ROSboard 
 
 ROS node that runs a web server on your robot.
-Run the node, point your web browser at http://your-robot-ip:8888/ and you get nice visualizations.
+Run the node, point your web browser at localhost:8888 (127.0.0.1:8888) and you get nice visualizations.
 
 ## NOTE:
 #########################################################################################.
